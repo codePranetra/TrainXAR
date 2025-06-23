@@ -1,42 +1,41 @@
-import streamlit as st
+from flask import Flask, render_template, request, jsonify
 from main import answer_question
 import uuid
 from chat_db import log_to_mysql
-st.set_page_config(page_title="TrainXar", page_icon="🤖")
-if "user_id" not in st.session_state:
-    st.session_state.user_id = str(uuid.uuid4())  # Unique ID per session
 
-if "history" not in st.session_state:
-    st.session_state.history = []
+app = Flask(__name__)
 
-def clear_chat():
-    st.session_state.history = []
+# Session-like storage (in-memory for simplicity)
+user_data = {
+    "user_id": str(uuid.uuid4()),
+    "history": []
+}
 
-with st.sidebar:
-    st.button("Clear chat", on_click=clear_chat)
+@app.route('/')
+def index():
+    return render_template('index.html', history=user_data['history'])
 
-st.header("TrainXar QA Bot")
+@app.route('/ask', methods=['POST'])
+def ask():
+    query = request.form.get('query', '').strip()
+    if not query:
+        return jsonify({"error": "Empty query"}), 400
 
-query = st.text_input("Ask me anything about TrainXar:", placeholder="Type your question here...")
-if query.strip():
-    with st.spinner("Typing..."):
-        try:
-            answer, sources = answer_question(query, user_id=st.session_state.user_id)
+    try:
+        answer, sources = answer_question(query, user_id=user_data['user_id'])
+        user_data['history'].append({
+            "query": query,
+            "answer": answer,
+            "sources": sources
+        })
+        return jsonify({"query": query, "answer": answer})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        except Exception as e:
-            st.error(f"Failed to get an answer: {e}")
-        else:
-            st.session_state.history.append({
-                "query": query,
-                "answer": answer,
-                "sources": sources
-            })
+@app.route('/clear', methods=['POST'])
+def clear():
+    user_data['history'] = []
+    return jsonify({"status": "cleared"})
 
-          
-
-
-
-for turn in st.session_state.history:
-    st.markdown(f"**You:** {turn['query']}")
-    st.markdown(f"**Bot:** {turn['answer']}")
-  
+if __name__ == '__main__':
+    app.run(debug=True)
