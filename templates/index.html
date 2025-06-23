@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrainXar - Ultimate Gym QA Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+            color: #e0e0e0;
+        }
+        body.light-mode {
+            background: linear-gradient(135deg, #e8ecef, #ced4da);
+            color: #1a1a1a;
+        }
+        .container {
+            max-width: 1000px;
+            width: 95%;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        body.dark-mode .container {
+            background: rgba(30, 30, 30, 0.95);
+        }
+        body.light-mode .container {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 94, 0, 0.1), transparent);
+            opacity: 0.3;
+            z-index: -1;
+        }
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: #ff5e00;
+            text-align: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 94, 0, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(255, 94, 0, 0.3); }
+            to { text-shadow: 0 0 15px rgba(255, 94, 0, 0.7); }
+        }
+        .chat-container {
+            height: 550px;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 2px solid #3a3a3a;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        body.dark-mode .chat-container {
+            background: rgba(40, 40, 40, 0.8);
+            border-color: #3a3a3a;
+        }
+        body.light-mode .chat-container {
+            background: rgba(245, 245, 245, 0.9);
+            border-color: #adb5bd;
+        }
+        .chat-container:hover {
+            border-color: #ff5e00;
+        }
+        .chat-message {
+            margin: 12px 0;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 85%;
+            font-size: 16px;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        body.dark-mode .user-message {
+            background: #ff5e00;
+            color: #fff;
+        }
+        body.light-mode .user-message {
+            background: #ff5e00;
+            color: #fff;
+        }
+        body.dark-mode .bot-message {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+        body.light-mode .bot-message {
+            background: #e0e0e0;
+            color: #1a1a1a;
+        }
+        .input-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+        }
+        body.dark-mode input[type="text"] {
+            border: 2px solid #3a3a3a;
+            background: rgba(50, 50, 50, 0.8);
+            color: #e0e0e0;
+        }
+        body.light-mode input[type="text"] {
+            border: 2px solid #adb5bd;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a1a;
+        }
+        input[type="text"]::placeholder {
+            color: #8a8a8a;
+        }
+        input[type="text"]:focus {
+            border-color: #ff5e00;
+            box-shadow: 0 0 10px rgba(255, 94, 0, 0.3);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            background: #ff5e00;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #e04e00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 94, 0, 0.5);
+        }
+        .clear-button {
+            background: #2e7d32;
+        }
+        .clear-button:hover {
+            background: #1b5e20;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.5);
+        }
+        .spinner {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            color: #ff5e00;
+            margin: 15px 0;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .theme-toggle input[type="checkbox"] {
+            display: none;
+        }
+        .theme-toggle label {
+            width: 50px;
+            height: 24px;
+            background: #3a3a3a;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .theme-toggle label::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: #ff5e00;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        .theme-toggle input:checked + label {
+            background: #2e7d32;
+        }
+        .theme-toggle input:checked + label::after {
+            transform: translateX(26px);
+        }
+        body.light-mode .theme-toggle label {
+            background: #adb5bd;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 10px;
+        }
+        body.dark-mode .chat-container::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+        body.light-mode .chat-container::-webkit-scrollbar-track {
+            background: #e0e0e0;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #ff5e00;
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+            .chat-container {
+                height: 450px;
+            }
+            input[type="text"], button {
+                font-size: 14px;
+                padding: 12px;
+            }
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 28px;
+            }
+            .chat-container {
+                height: 350px;
+            }
+            .input-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            input[type="text"] {
+                width: 100%;
+            }
+            button {
+                width: 100%;
+                padding: 12px;
+            }
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <div class="theme-toggle">
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+            <label for="themeToggle"></label>
+        </div>
+        <h1>TrainXar Gym QA Bot</h1>
+        <div class="chat-container" id="chatContainer">
+            {% for turn in history %}
+                <div class="chat-message user-message">You: {{ turn.query }}</div>
+                <div class="chat-message bot-message">Bot: {{ turn.answer }}</div>
+            {% endfor %}
+        </div>
+        <div class="spinner" id="spinner">Crushing your question...</div>
+        <div class="input-container">
+            <input type="text" id="queryInput" placeholder="Ask about workouts, nutrition, or TrainXar..." onkeypress="if(event.key === 'Enter') submitQuery();">
+            <button onclick="submitQuery()">Submit</button>
+            <button class="clear-button" onclick="clearChat()">Clear Chat</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const queryInput = document.getElementById('queryInput');
+        const spinner = document.getElementById('spinner');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.body.classList.add('light-mode');
+            themeToggle.checked = true;
+        }
+
+        function toggleTheme() {
+            if (themeToggle.checked) {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function submitQuery() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            spinner.style.display = 'block';
+            queryInput.disabled = true;
+            queryInput.value = '';
+
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user-message';
+            userMessage.textContent = `You: ${query}`;
+            chatContainer.appendChild(userMessage);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `query=${encodeURIComponent(query)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';
+                queryInput.disabled = false;
+
+                if (data.error) {
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'chat-message bot-message';
+                    errorMessage.textContent = `Error: ${data.error}`;
+                    chatContainer.appendChild(errorMessage);
+                } else {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chat-message bot-message';
+                    botMessage.textContent = `Bot: ${data.answer}`;
+                    chatContainer.appendChild(botMessage);
+                }
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                queryInput.disabled = false;
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'chat-message bot-message';
+                errorMessage.textContent = `Error: ${error}`;
+                chatContainer.appendChild(errorMessage);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        }
+
+        function clearChat() {
+            fetch('/clear', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'cleared') {
+                    chatContainer.innerHTML = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

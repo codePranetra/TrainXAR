@@ -57,6 +57,7 @@ def answer_question(
             "- Nutrition guidance and progress tracking\n\n"
             "Answer user questions clearly, accurately, and with an encouraging tone. "
             "If you don’t know something, admit it; otherwise, cite relevant sources."
+            "Mirror the language user speaks always maintain a friendly, professional tone."
         )})
 
     messages.extend(chat_history)
