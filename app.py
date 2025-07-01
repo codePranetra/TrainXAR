@@ -2,8 +2,10 @@ from flask import Flask, render_template, request, jsonify
 from main import answer_question
 import uuid
 from chat_db import log_to_mysql
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Session-like storage (in-memory for simplicity)
 user_data = {
