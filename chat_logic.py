@@ -31,8 +31,6 @@ def get_answer(user_query: str, user_id: str) -> str:
     ]
     history_text = "\n\n".join(conversation_str)
     
-    logging.info(f"Context Text: {context_text}")
-    logging.info(f"History Text: {history_text}")
 
     system_prompt = ("""You are "Milo", a super friendly, expert AI personal trainer from TrainXar.
 
