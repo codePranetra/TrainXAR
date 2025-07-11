@@ -1,5 +1,0 @@
-userid(webid)
-Chat change 
-Deploy(Database req.)  
-Frontend (Mobile Responsive)
-
