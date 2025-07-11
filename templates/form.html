@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Application Form</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+    
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+    
+        form {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+        }
+    
+        fieldset {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+    
+        legend {
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0 10px;
+            color: #444;
+        }
+    
+        label {
+            display: block;
+            /* margin-bottom: 15px; */
+            font-weight: 500;
+            color: #333;
+        }
+    
+        input,
+        select,
+        textarea {
+            width: 100%;
+            max-width: 600px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    
+        input[type="file"] {
+            padding: 5px;
+        }
+    
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto 0;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+    
+        button[type="submit"]:hover {
+            background-color: #003f88;
+        }
+    
+        p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        label{
+            width: 48%; 
+            margin: 0;
+        }
+        label input{
+            width: 100%;
+        }
+
+        fieldset{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        input, label{
+            width: 100% !important;
+        }
+        table{
+            width: 100% !important;
+        }
+        table td{
+            padding: 5px 10px;
+        }
+    </style>    
+</head>
+<body>
+    <h2>Student Application Form</h2>
+    <form action="/submit_form" method="POST" enctype="multipart/form-data">
+
+<fieldset>
+    <legend>Application Identifiers</legend>
+    <table>
+        <tr>
+            <td><label>Lead ID: <input type="text" name="Lead_id_c"></label></td>
+            <td><label>Status: <input type="text" name="Status"></label></td>
+        </tr>
+        <tr>
+            <td><label>Application ID: <input type="text" name="Application_id__c"></label></td>
+            <td><label>Company: <input type="text" name="Company"></label></td>
+        </tr>
+        <tr>
+            <td><label>Given Name (Custom): <input type="text" name="Given_name__c"></label></td>
+            <td> <label>Family Name (Custom): <input type="text" name="Family_name__c"></label></td>
+        </tr>
+    </table>    
+</fieldset>
+
+
+        <fieldset>
+            <legend>Agent Information</legend>
+            <table>
+                <tr>
+                    <td><label>Representative Name: <input type="text" name="rep_name"></label></td>
+                    <td><label>Agent URN: <input type="text" name="agent_urn"></label></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Student Information</legend>
+            <table> 
+                <tr>
+                    <td><label>Salutation: <input type="text" name="Salutation"></label></td>
+                    <td><label>First Name: <input type="text" name="FirstName"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Last Name: <input type="text" name="LastName"></label></td>
+                    <td><label>Date of Birth: <input type="date" name="Date_of_Birth__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Gender: <input type="text" name="Gender__c"></label></td>
+                    <td><label>Nationality: <input type="text" name="Nationality__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Email: <input type="email" name="Email"></label></td>
+                    <td><label>Phone: <input type="tel" name="Phone"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Home Address: <input type="text" name="Student_Home_Address__c"></label></td>
+                    <td><label>Postcode: <input type="text" name="Postcode__c"></label></td>
+                </tr>
+            </table>      
+        </fieldset>
+
+        <fieldset>
+            <legend>Programme & Course Details</legend>
+            <table>
+                <tr>
+                    <td><label>Type of Programme: <input type="text" name="Type_of_Programme__c"></label></td>
+                    <td><label>Course Preference: <input type="text" name="Course_Preference__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Location Preference: <input type="text" name="Location_preference__c"></label></td>
+                    <td><label>University: <input type="text" name="University__c"></label></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>English Language Proficiency</legend>
+            <table>
+                <tr>
+                    <td><label>Holds English Qualification:
+                        <select name="English_Language__c" id="English_Language__c">
+                          <option value="">Select</option>
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      </label></td>
+                    <td><label>English Test Name: <input type="text" name="English_Test__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Listening Score: <input type="number" step="0.1" name="Listening__c"></label></td>
+                    <td><label>Reading Score: <input type="number" step="0.1" name="Reading__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Writing Score: <input type="number" step="0.1" name="Writing__c"></label></td>
+                    <td><label>Speaking Score: <input type="number" step="0.1" name="Speaking__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Overall Score: <input type="number" step="0.1" name="Overall_Score__c"></label></td>
+                    <td><label>Test Date: <input type="date" name="Test_Date__c"></label></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Academic Background</legend>
+            <table>
+                <tr>
+                    <td><label>Institution Name: <input type="text" name="Institution_Name__c"></label></td>
+                    <td><label>Country of Qualification: <input type="text" name="Qualification_Country__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>Qualification: <input type="text" name="Qualification__c"></label></td>
+                    <td><label>From Date: <input type="date" name="From_Date__c"></label></td>
+                </tr>
+                <tr>
+                    <td><label>To Date: <input type="date" name="To_Date__c"></label></td>
+                    <td><label>Provide Final Academic Results:
+                        <select name="Provide_Final_Academic_Results__c">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </label></td>
+                </tr>
+                <tr>
+                    <td><label>Grade Type: <input type="text" name="Grade_Type__c"></label></td>
+                    <td><label>Overall Grade: <input type="text" name="Overall_Grade__c"></label></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Supporting Documents</legend>
+            <table>
+                <tr>
+                    <td><label>Passport: <input type="file" name="passport"></label></td>
+                    <td><label>Academic Transcript: <input type="file" name="transcript"></label></td>
+                </tr>
+                <tr>
+                    <td><label>English Test Report: <input type="file" name="english_test"></label></td>
+                    <td><label>Other Supporting Document: <input type="file" name="other_doc"></label></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Undertaking by Agent</legend>
+            <p>By submitting this form, I confirm that I have the student's consent and that the information is accurate.</p>
+            <label>Agent Name: <input type="text" name="agent_confirm_name"></label>
+            <label>Date: <input type="datetime-local" name="agent_confirm_date"></label>
+        </fieldset>
+
+    </form>
+</body>
+</html>

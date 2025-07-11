@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with TrainXar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Same styling as before */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-container {
+            width: 96%;
+            max-width: 1500px;
+            height: 90vh;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(30,77,183,0.1);
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #fff;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1E4DB7;
+            padding: 5px 20px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(30,77,183,0.08);
+        }
+        .profile-pic img{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+            background: #fff;
+            border: 2px solid #5ac8fa;
+        }
+
+        .message-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e8f4fd' fill-opacity='0.3'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+
+        .message {
+            padding: 14px 20px;
+            margin: 8px 0;
+            max-width: 70%;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(30,77,183,0.06);
+            transition: background 0.2s;
+            border: 1.5px solid #e0eaff;
+        }
+
+        .message.user {
+            background: #eaf6fb;
+            color: #1E4DB7;
+            align-self: flex-end;
+            border-bottom-right-radius: 8px;
+            border-top-right-radius: 18px;
+            border-top-left-radius: 18px;
+            border-bottom-left-radius: 18px;
+            margin-left: 20%;
+            margin-bottom: 12px;
+        }
+
+        .message.bot {
+            background: #eaf6fb;
+            color: #1E4DB7;
+            align-self: flex-start;
+            border-bottom-left-radius: 8px;
+            border-top-right-radius: 18px;
+            border-top-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            margin-right: 20%;
+            margin-bottom: 12px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        .date-separator {
+            text-align: center;
+            margin: 24px 0 16px 0;
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .date-separator::before,
+        .date-separator::after {
+            content: '';
+            display: inline-block;
+            width: 30%;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px 20px;
+            border-top: 1px solid #e0eaff;
+            gap: 10px;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(30,77,183,0.08);
+            backdrop-filter: blur(10px);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .input-container input[type="text"] {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0eaff;
+            border-radius: 24px;
+            margin-right: 10px;
+            font-size: 16px;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(30,77,183,0.06);
+        }
+
+        .input-container input[type="text"]:focus {
+            border-color: #5ac8fa;
+            box-shadow: 0 2px 12px rgba(90,200,250,0.15);
+        }
+
+        .input-container input[type="file"] {
+            display: none;
+        }
+
+        .input-container label, .input-container button {
+            padding: 10px 15px;
+            background: #1E4DB7;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(30,77,183,0.15);
+            min-width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-container label:hover, .input-container button:hover {
+            background: #3a6edc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30,77,183,0.2);
+        }
+
+        .file-link {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .typing-loader {
+            color: #555;
+            margin: 5px 0;
+        }
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .bot-button {
+            padding: 10px 15px;
+            background: #1E4DB7;
+            color: #fff;
+            border: 2px solid #1E4DB7;
+            border-radius: 24px;
+            cursor: pointer;
+            width: 50%;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .bot-button:hover {
+            background-color: #3a6edc;
+            color: #fff;
+            border: 2px solid #3a6edc;
+        }
+        .bot-button.disabled-button {
+            background-color: #e0eaff !important; /* Light blue gray out */
+            color: #b0b0b0 !important; /* Dim text color */
+            cursor: not-allowed !important; /* Show "not-allowed" cursor */
+            border: 1px solid #b0b0b0 !important; /* Add a faded border */
+            pointer-events: none !important; /* Ensure no further clicks */
+        }
+        .media-message{
+            /* background-color: #ffffff; */
+            padding:10px 5px 10px 0;
+            min-width: 150px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .media-message{
+            display: flex;
+            align-items: center;
+            height: 20px;
+        }
+        .file-icon-doc{
+            height: 30px;
+        }
+        .file-icon-download{
+            height: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <div class="chat-container">
+            <div class="header">
+                <div class="profile-info">
+                    <div class="profile-pic">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Bot Avatar">
+                        <span class="name">TrainXar Bot</span>
+                    </div>
+                </div>
+                <!-- <div>John Doe</div>
+                <div><i class="fas fa-ellipsis-v"></i></div> -->
+            </div>
+
+            <div class="message-box" id="message-box"></div>
+
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Type a message..." />
+                <label for="file-upload" style="display: none;"><i class="fas fa-paperclip"></i></label>
+                <input type="file" id="file-upload" multiple />
+                <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <script>
+        const API_BASE_URL = "{{ base_url }}";
+        const BOT_ID = "{{ bot_id }}";
+        const messageBox = document.getElementById('message-box');
+        const messageInput = document.getElementById('message-input');
+        const fileUpload = document.getElementById('file-upload');
+        const sendButton = document.getElementById('send-button');
+
+        function getUserId() {
+            let userId = localStorage.getItem('user_id');
+            if (!userId) {
+                userId = 'user-' + Math.random().toString(36).substring(2, 10);
+                localStorage.setItem('user_id', userId);
+            }
+            return userId;
+        }
+
+        const USER_ID = getUserId();
+
+        function addMessage(content, isUser, isFile = false, message = null, local = false) {
+            const msg = document.createElement('div');
+            msg.classList.add('message', isUser ? 'user' : 'bot');
+
+            if(isFile) {
+                function getFileExtension(url) {
+                    return url.split('.').pop().toLowerCase();
+                }
+                // Mapping file extensions to icons
+                const fileIcons = {
+                    'pdf': '/static/assets/Extentions/pdf.png',
+                    'jpg': '/static/assets/Extentions/file.png',
+                    'jpeg': '/static/assets/Extentions/file.png',
+                    'png': '/static/assets/Extentions/file.png',
+                    'gif': '/static/assets/Extentions/gif.png',
+                    'doc': '/static/assets/Extentions/docs.png',
+                    'docx': '/static/assets/Extentions/docs.png',
+                    'xls': '/static/assets/Extentions/excel.png',
+                    'xlsx': '/static/assets/Extentions/excel.png',
+                    'csv': '/static/assets/Extentions/excel.png',
+                    'ppt': '/static/assets/Extentions/ppt.png',
+                    'pptx': '/static/assets/Extentions/ppt.png',
+                    'txt': '/static/assets/Extentions/txt.png',
+                    'zip': '/static/assets/Extentions/zip.png',
+                    'rar': '/static/assets/Extentions/zip.png'
+                };
+                // Get file extension
+                let fileExtension = getFileExtension(message.media_path);
+                let fileIcon = fileIcons[fileExtension] || '/static/assets/Extentions/defalt.png';
+                msg.innerHTML = isFile ? `<a href="${local ? '#' : message.media_path}" class="file-link"><div class="media-message"> <img src="${API_BASE_URL}/${fileIcon}" alt="File Icon" class="file-icon-doc">  <img src="${API_BASE_URL}/static/assets/Extentions/download.svg" alt="File Icon" class="file-icon-download"></div></a>` : content;
+                messageBox.appendChild(msg);
+            }
+            else if (!isUser) {
+                // Bot message: render markdown and sanitize
+                const html = marked.parse(content);
+                const cleanHtml = DOMPurify.sanitize(html);
+                msg.innerHTML = cleanHtml;
+                messageBox.appendChild(msg);
+            }
+            else {
+                // User message: render as plain text
+                msg.textContent = content;
+                messageBox.appendChild(msg);
+            }
+
+            // Add timestamp
+            const timestamp = document.createElement('div');
+            timestamp.classList.add('message-time');
+            let timeString;
+            if (message && message.created_at && typeof message.created_at === 'string') {
+                // Parse the backend time string and format as needed
+                const dateObj = new Date(message.created_at.replace(' ', 'T'));
+                timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            timestamp.textContent = timeString;
+            msg.appendChild(timestamp);
+
+            // Scroll to the bottom after adding a new message
+            messageBox.scrollTop = messageBox.scrollHeight;
+        }
+
+        function addDateSeparator(date) {
+            const separator = document.createElement('div');
+            separator.classList.add('date-separator');
+            
+            const today = new Date();
+            const messageDate = new Date(date);
+            const diffTime = Math.abs(today - messageDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            let dateText;
+            if (diffDays === 0) {
+                dateText = 'Today';
+            } else if (diffDays === 1) {
+                dateText = 'Yesterday';
+            } else if (diffDays < 7) {
+                dateText = messageDate.toLocaleDateString([], { weekday: 'long' });
+            } else {
+                dateText = messageDate.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            
+            separator.textContent = dateText;
+            messageBox.insertBefore(separator, messageBox.firstChild);
+        }
+
+        function sendbutton(isUser, disabled = false) {
+            const msg = document.createElement('div');
+            msg.classList.add('message', isUser ? 'user' : 'bot');
+            msg.innerHTML = `<p>I hereby confirm that the submitted documents are accurate, authentic, and unaltered in any form. I acknowledge that the university have the right to use these documents for application processing, issuance of the offer letter, and any information sharing activities.</p>
+                <div class="button-group">
+                    <button class="bot-button ${disabled ? 'disabled-button' : ''}" ${disabled ? 'disabled' : ''} onclick="sendConsent(this, 'Yes, I Consent')">Yes, I Consent</button>
+                    <button class="bot-button ${disabled ? 'disabled-button' : ''}" ${disabled ? 'disabled' : ''} onclick="sendConsent(this, 'No')">No</button>
+                </div>`;
+            messageBox.appendChild(msg);
+        }
+
+        // function sendbutton() {
+        //     console.log("Send button clicked");
+        //    return button =  `<div class="message bot">
+        //         <p>Do you want to proceed?</p>
+        //         <div class="button-group">
+        //             <button class="bot-button" onclick="handleBotResponse('yes')">Yes</button>
+        //             <button class="bot-button" onclick="handleBotResponse('no')">No</button>
+        //         </div>
+        //     </div>`
+
+        //     messageBox.insertBefore(button, messageBox.firstChild);   
+        // }
+
+        async function fetchMessages() {
+            try {
+                messageBox.innerHTML = '';
+                const response = await fetch(`${API_BASE_URL}/get-messages?bot_id=${BOT_ID}&user_id=${USER_ID}`);
+                const data = await response.json();
+                if (Array.isArray(data.data)) {
+                    data.data.forEach((msg, index) => {
+                        if (msg.media_type == 'button') {
+                            sendbutton(false, true);
+                        }
+                        else if (msg.media_type != '' && msg.media_path != null) {
+                            addMessage(msg.content, msg.role === 'user', true, msg);
+                        } else {
+                            addMessage(msg.content, msg.role === 'user', false, msg);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch messages:", error);
+            }
+        }
+
+        async function sendFiles(files) {
+            const formData = new FormData();
+            formData.append('bot_id', BOT_ID);
+            formData.append('user_id', USER_ID);
+            files.forEach(file => formData.append('documents[]', file));
+
+            // Show upload preview
+            files.forEach((file) => {
+                // addMessage(`Uploading: ${file.name}`, true);
+                msg = {
+                    media_path: file.name
+                }
+                addMessage(`Uploading: ${file.name}`, true, true, msg, true);
+            });
+
+            // Loader
+            const loader = document.createElement('div');
+            loader.classList.add('typing-loader');
+            loader.textContent = 'Uploading...';
+            messageBox.appendChild(loader);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                loader.remove();
+
+                fetchMessages();
+            } catch (error) {
+                loader.remove();
+                console.error("File upload failed:", error);
+            }
+        }
+
+        async function sendMessage(message,) {
+            // Instantly show the user's message with a temporary timestamp
+            addMessage(message, true, false, { created_at: new Date().toISOString() });
+            messageBox.scrollTop = messageBox.scrollHeight;
+
+            const formData = new FormData();
+            formData.append('bot_id', BOT_ID);
+            formData.append('user_id', USER_ID);
+            formData.append('message', message);
+
+            // Loader
+            const loader = document.createElement('div');
+            loader.classList.add('typing-loader');
+            loader.textContent = 'Typing...';
+            messageBox.appendChild(loader);
+            messageBox.scrollTop = messageBox.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                loader.remove();
+
+                fetchMessages();
+            } catch (error) {
+                loader.remove();
+                console.error("Failed to send message:", error);
+            }
+        }
+
+        async function sendConsent(button, message) {
+            button.disabled = true;
+            button.classList.add("disabled-button");
+
+            const formData = new FormData();
+            formData.append('bot_id', BOT_ID);
+            formData.append('user_id', USER_ID);
+            formData.append('consent', message);
+
+            // ✅ Add a loader to indicate waiting
+            const loader = document.createElement('div');
+            loader.classList.add('typing-loader');
+            loader.textContent = 'Typing...';
+            messageBox.appendChild(loader);
+
+            console.log(formData);
+
+            // ✅ Create an AbortController to handle timeout
+            const controller = new AbortController();
+            const timeout = setTimeout(() => {
+                controller.abort();  // Cancel the request if it takes too long
+                console.error("Request timed out!");
+            }, 300000);  // ⏳ 30 seconds timeout
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal  // Attach the signal
+                });
+
+                clearTimeout(timeout);  // ✅ Clear timeout when the request completes
+
+                const data = await response.json();
+                loader.remove();
+
+                fetchMessages();
+            } catch (error) {
+                loader.remove();
+                if (error.name === "AbortError") {
+                    console.error("Request took too long and was aborted.");
+                } else {
+                    console.error("Failed to send message:", error);
+                }
+            }
+        }
+
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                messageInput.value = '';
+            }
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                    messageInput.value = '';
+                }
+            }
+        });
+
+        fileUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                sendFiles(files);
+                fileUpload.value = ''; // Reset input
+            }
+        });
+
+        fetchMessages(); // Initial fetch
+    </script>
+
+</body>
+
+</html>
