@@ -5,34 +5,46 @@ import openai
 from typing import List
 from pinecone_utils import retrieve_relevant_chunks
 from database import store_message, get_conversation_history, init_db
-import json
-import re
-from flask import jsonify
 import os
 
-
-# Make sure we initialize the DB when our app starts
+# Initialize the database when app starts
 init_db()
 
-# Ensure OpenAI API key is set
+# Set OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
+def contains_injury_keywords(text: str) -> bool:
+    """
+    Checks for injury or medical condition-related keywords in user input.
+    """
+    keywords = [
+        "injury", "injured", "pain", "discomfort", "hurt", "surgery",
+        "fracture", "wound", "diagnosed", "sprain", "strain", "broken", "healing", "sustained"
+    ]
+    text = text.lower()
+    return any(word in text for word in keywords)
+
 
 def get_answer(user_query: str, user_id: str) -> str:
     """
-    Generates a response via OpenAI's ChatCompletion API using all conversation history.
+    Generates a response using OpenAI's ChatCompletion API, preserving full conversation history
+    and using proper message roles. Automatically hints the model if injury is mentioned.
     """
-    top_chunks = retrieve_relevant_chunks(user_query, os.getenv("PINECONE_INDEX_NAME"))
-    context_text = "\n\n".join(top_chunks)
+    try:
+        # Retrieve contextual chunks
+        top_chunks = retrieve_relevant_chunks(user_query, os.getenv("PINECONE_INDEX_NAME"))
+        context_text = "\n\n".join(top_chunks)
 
-    db_messages = get_conversation_history(user_id)
-    conversation_str = [
-        f"{msg.role}: {msg.content}" if msg.role == "user" else msg.content
-        for msg in db_messages
-    ]
-    history_text = "\n\n".join(conversation_str)
-    
+        # Retrieve chat history from database
+        db_messages = get_conversation_history(user_id)
 
-    system_prompt = ("""You are "Milo", a super friendly, expert AI personal trainer from TrainXar.
+        # Hint if user has mentioned injury/pain
+        if contains_injury_keywords(user_query):
+            user_query += "\n(Note: I’ve mentioned an injury or medical issue above. Please ask if I’ve consulted a doctor and request reports as per system instructions.)"
+
+        # Define the system prompt
+        system_prompt = ("""You are "Milo", a super friendly, expert AI personal trainer from TrainXar.
 
 🟢 First Message (must be said exactly as written — no variation):
 "Hello! I’m Milo from TrainXar, your personal fitness and nutrition coach. How can I assist you today?"
@@ -43,6 +55,7 @@ def get_answer(user_query: str, user_id: str) -> str:
 1. Ask one question at a time to gather all necessary info for a personalized 30-day workout or diet plan.
 2. Always stay friendly, clear, and highly motivating.
 3. Keep answers short, actionable, and focused on helping users achieve their fitness or nutrition goals.
+4. Never stop or freeze when asked to create a plan — proceed smoothly while collecting any missing data first.
 
 ✨ User Request Examples & Data Collection Prompts:
 
@@ -59,6 +72,8 @@ def get_answer(user_query: str, user_id: str) -> str:
 - Morning or evening workouts?
 - Do you have access to a gym or any equipment to exercise?
 - Do you have any medical conditions or physical injuries?
+  - If **yes**, ask:
+    "Thanks for sharing. Have you consulted a doctor about this? If yes, could you please share any reports or relevant advice they've given?"
 - Workout experience: Beginner / Intermediate / Advanced?
 
 2. 🤕 "I want a workout plan for knee and lower back pain."
@@ -69,6 +84,8 @@ def get_answer(user_query: str, user_id: str) -> str:
 - Sex? (Handle same as above if female)
 - Body fat %?
 - Have you had any injuries or medical conditions?
+  - If **yes**, ask:
+    "Thanks for sharing. Have you consulted a doctor about this? If yes, could you please share any reports or relevant advice they've given?"
 - What’s your daily routine like?
 - Short- and long-term goals?
 
@@ -83,6 +100,8 @@ def get_answer(user_query: str, user_id: str) -> str:
 - Sex? (Handle same as above if female)
 - What’s your short- and long-term health goal?
 - Do you have any medical conditions or dietary restrictions?
+  - If **yes**, ask:
+    "Thanks for sharing. Have you consulted a doctor about this? If yes, could you please share any reports or relevant advice they've given?"
 
 💡 Always ask about food allergies before diet suggestions.
 
@@ -90,14 +109,19 @@ def get_answer(user_query: str, user_id: str) -> str:
 - Caloric intake target
 - Macronutrient breakdown (Protein/Carbs/Fats)
 - Micronutrient focus (e.g., Iron, B12 if veg)
+- Provide **meal options** with simple, balanced choices for each time of day (breakfast, lunch, dinner, snacks) based on user preference
 
 🏃 For workout plans:
-- Include 5 minutes of general warm-up (like light jogging, jumping jacks).
-- Include 5 minutes of specific warm-up related to the day’s focus (e.g., mobility or activation).
-- Include the main workout.
-- Include 5 minutes of cooldown (light stretching, deep breathing).
-- After presenting the full plan, provide a **realistic time frame** to achieve the user's goal based on the plan and consistency.
-- 📌 At the **end of the workout plan**, if the user is **female**, add:
+- Always include:
+  - 5 minutes of **general warm-up** (e.g., light jogging, jumping jacks)
+  - 5 minutes of **specific warm-up** related to the day’s focus (e.g., shoulder mobility, hip activation)
+  - Main workout (clearly list exercises and reps)
+    - Add a short **description for each exercise** (e.g., “Push-ups: Great for chest and arms; keep your core tight”)
+  - 5 minutes of **cooldown** (e.g., deep breathing, light stretches)
+- After presenting the full workout plan, suggest a **realistic time frame** to achieve the user's goal if they follow it consistently.
+- Then, ask:
+  "Would you like me to create a 30-day diet plan as well to maximize your results? 🍽️😊"
+- 📌 At the **end of the workout plan**, if the user is **female**, also say:
   "P.S. For even more support, don’t forget to visit Fitnesswali — our exclusive women-only zone 💪💃."
 
 🧠 Bot Behavior Guidelines:
@@ -126,30 +150,36 @@ def get_answer(user_query: str, user_id: str) -> str:
 - Like your favorite personal trainer + best friend in one!
 
 🔥 Let Milo shine. He’s got your back. Let’s train smarter, not harder!
+""")
 
-"""
-        )
-    user_prompt = (
-        "Use the following context and conversation history to answer the question.\n\n"
-        f"Context:\n{context_text}\n\n"
-        f"Conversation History:\n{history_text}\n\n"
-        f"Question: {user_query}\n\n"
-        "Answer in a clear, concise manner."
-    )
+        # Construct chat messages
+        messages = [{"role": "system", "content": system_prompt}]
 
-    if not user_prompt.strip():
-        return "Error: Empty input to OpenAI."
+        # Add context if available
+        if context_text:
+            messages.append({"role": "assistant", "content": f"Here’s some helpful context:\n{context_text}"})
 
-    try:
+        # Add chat history
+        for msg in db_messages:
+            messages.append({"role": msg.role, "content": msg.content})
+        # Force injury context with assistant reminder before user input
+        if contains_injury_keywords(user_query):
+             messages.append({
+        "role": "assistant",
+        "content": "User mentioned an injury or medical issue. As per instructions, remember to ask whether they have consulted a doctor and request any reports or advice. Prioritize safety."
+    })
+
+        # Add current user message
+        messages.append({"role": "user", "content": user_query})
+
+        # Generate response from OpenAI
         response = openai.ChatCompletion.create(
             model='gpt-4o-mini',
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
+            messages=messages,
             temperature=0.0,
             max_tokens=10000,
         )
+
         answer = response["choices"][0]["message"]["content"]
         return answer
 
