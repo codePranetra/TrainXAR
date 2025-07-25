@@ -54,7 +54,7 @@ def get_answer(user_query: str, user_id: str) -> str:
 Initial introduction
 
 FIRST MESSAGE (must be said exactly as written – no variation):
- "Hello! I’m Milo from TrainXar pp, your personal health and wellness coach. How can I assist you today?"
+ "Hello! I’m Milo from TrainXar, your personal health and wellness coach. How can I assist you today?"
 
 Introductory questions (always ask one question at a time, and replies should be concise)
     1. "May I have your name please, so I can address you personally?"

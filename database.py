@@ -2,8 +2,6 @@ import os
 import datetime
 import pytz
 import logging
-import sqlite3
-
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base
 from config import (
@@ -24,6 +22,14 @@ ist = pytz.timezone('Asia/Calcutta')
 
 
 # ------------------ SQLAlchemy Model ------------------
+class UserMeta(Base):
+    __tablename__ = "user_meta"
+
+    user_id = Column(String(255), primary_key=True)
+    conversation_count = Column(Integer, default=0)
+    gender = Column(String(20), default=None)  # or any suitable length
+    fitnesswali_suggested = Column(Integer, default=0)  # Use 0/1 as boolean
+
 
 class Message(Base):
     __tablename__ = "messages"
@@ -45,31 +51,6 @@ class Message(Base):
 
 def init_db():
     Base.metadata.create_all(engine)
-
-    # Initialize SQLite tables (for user_meta)
-    conn = sqlite3.connect('chat.db')
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS messages (
-            user_id TEXT,
-            role TEXT,
-            content TEXT
-        )
-    ''')
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_meta (
-            user_id TEXT PRIMARY KEY,
-            conversation_count INTEGER DEFAULT 0,
-            is_female BOOLEAN DEFAULT 1,
-            fitnesswali_suggested BOOLEAN DEFAULT 0
-        )
-    ''')
-
-    conn.commit()
-    conn.close()
-
 
 # ------------------ SQLAlchemy Session ------------------
 
@@ -160,42 +141,39 @@ def get_media_path(user_id: str, bot_id: str = None, limit: int = None):
         session.close()
 
 
-# ------------------ SQLite: user_meta ------------------
+# ------------------ SQLAlchemy: user_meta ------------------
 
 def get_user_meta(user_id: str) -> dict:
-    conn = sqlite3.connect('chat.db')
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT conversation_count, is_female, fitnesswali_suggested FROM user_meta WHERE user_id = ?", (user_id,))
-    row = cursor.fetchone()
-    conn.close()
-
-    if row:
+    session = get_db_session()
+    try:
+        user = session.query(UserMeta).filter_by(user_id=user_id).first()
+        if not user:
+            return None
         return {
-            "conversation_count": row[0],
-            "is_female": bool(row[1]),
-            "fitnesswali_suggested": bool(row[2])
+            "conversation_count": user.conversation_count,
+            "gender": user.gender,
+            "fitnesswali_suggested": bool(user.fitnesswali_suggested)
         }
-    return None
+    finally:
+        session.close()
 
 
 def update_user_meta(user_id: str, meta: dict):
-    conn = sqlite3.connect('chat.db')
-    cursor = conn.cursor()
+    session = get_db_session()
+    try:
+        user = session.query(UserMeta).filter_by(user_id=user_id).first()
+        if not user:
+            user = UserMeta(user_id=user_id)
 
-    cursor.execute("""
-        INSERT INTO user_meta (user_id, conversation_count, is_female, fitnesswali_suggested)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET
-            conversation_count = excluded.conversation_count,
-            is_female = excluded.is_female,
-            fitnesswali_suggested = excluded.fitnesswali_suggested;
-    """, (
-        user_id,
-        meta.get("conversation_count", 0),
-        int(meta.get("is_female", True)),
-        int(meta.get("fitnesswali_suggested", False))
-    ))
+        user.conversation_count = meta.get("conversation_count", user.conversation_count or 0)
+        user.gender = meta.get("gender", user.gender)
+        user.fitnesswali_suggested = int(meta.get("fitnesswali_suggested", user.fitnesswali_suggested or 0))
 
-    conn.commit()
-    conn.close()
+        session.add(user)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        logging.error(f"Failed to update user meta: {e}")
+    finally:
+        session.close()
+
