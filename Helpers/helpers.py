@@ -121,39 +121,6 @@ def send_whatsapp_document(wh_access_token, wh_phone_number_id, recipient_id, do
 
 
 
-def send_whatsapp_document(wh_access_token, wh_phone_number_id, recipient_id, document_url, document_filename=None, caption=None):
-    """
-    Send a document via WhatsApp Cloud API.
-    """
-    WH_API_URL = f"https://graph.facebook.com/v17.0/{wh_phone_number_id}/messages"
-    
-    headers = {
-        "Authorization": f"Bearer {wh_access_token}",
-        "Content-Type": "application/json"
-    }
-    
-    payload = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": recipient_id,
-        "type": "document",
-        "document": {
-            "link": document_url
-        }
-    }
-    
-    if document_filename:
-        payload["document"]["filename"] = document_filename
-    
-    if caption:
-        payload["document"]["caption"] = caption
-    
-    response = requests.post(WH_API_URL, headers=headers, json=payload)
-    
-    if response.status_code == 200:
-        return {"code": response.status_code, "message": response.json()}
-    else:
-        return {"code": response.status_code, "message": response.text}
 
 def send_whatsapp_button(wh_access_token, wh_phone_number_id, recipient_id, bot_id,bot_button_text):
     """

@@ -29,5 +29,4 @@ def getMessages(data):
 
 def webbot():
    return render_template("webbot.html", base_url=os.getenv("base_url"))
-    
-
+ 

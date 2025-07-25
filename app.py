@@ -1,5 +1,7 @@
 import logging
-from flask import Flask, request, render_template_string, send_file, request,jsonify
+# from flask import Flask, request, render_template_string, send_file, request,jsonify
+from flask import Flask, request
+
 from controllers import chatController
 from database import  init_db
 from flask_cors import CORS
