@@ -248,6 +248,8 @@
         .file-icon-download{
             height: 20px;
         }
+       
+        
 
     </style>
 </head>
@@ -267,7 +269,9 @@
                 <div><i class="fas fa-ellipsis-v"></i></div> -->
             </div>
 
-            <div class="message-box" id="message-box"></div>
+            <div class="message-box" id="message-box">
+                
+            </div>
 
             <div class="input-container">
                 <input type="text" id="message-input" placeholder="Type a message..." />
@@ -277,6 +281,8 @@
             </div>
         </div>
     </div>
+<!--  <button id="scrollToBottom" class="scroll-btn" type="button">↓</button>  -->
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <script>
@@ -296,7 +302,11 @@
             return userId;
         }
 
-        const USER_ID = getUserId();
+    const USER_ID = getUserId();
+    let greetingAdded = false;
+    let hasShownWelcome = false;
+
+
 
         function addMessage(content, isUser, isFile = false, message = null, local = false) {
             const msg = document.createElement('div');
@@ -409,27 +419,74 @@
         //     messageBox.insertBefore(button, messageBox.firstChild);   
         // }
 
-        async function fetchMessages() {
-            try {
-                messageBox.innerHTML = '';
-                const response = await fetch(`${API_BASE_URL}/get-messages?bot_id=${BOT_ID}&user_id=${USER_ID}`);
-                const data = await response.json();
-                if (Array.isArray(data.data)) {
-                    data.data.forEach((msg, index) => {
-                        if (msg.media_type == 'button') {
-                            sendbutton(false, true);
-                        }
-                        else if (msg.media_type != '' && msg.media_path != null) {
-                            addMessage(msg.content, msg.role === 'user', true, msg);
-                        } else {
-                            addMessage(msg.content, msg.role === 'user', false, msg);
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Failed to fetch messages:", error);
-            }
+        // <!-- async function fetchMessages() {
+        //     try {
+        //        messageBox.innerHTML = '';
+
+     
+
+        //         const response = await fetch(`${API_BASE_URL}/get-messages?bot_id=${BOT_ID}&user_id=${USER_ID}`);
+        //         const data = await response.json();
+        //         if (Array.isArray(data.data)) {
+        //             data.data.forEach((msg, index) => {
+        //                 if (msg.media_type == 'button') {
+        //                     sendbutton(false, true);
+        //                 }
+        //                 else if (msg.media_type != '' && msg.media_path != null) {
+        //                     addMessage(msg.content, msg.role === 'user', true, msg);
+        //                 } else {
+        //                     addMessage(msg.content, msg.role === 'user', false, msg);
+        //                 }
+        //             });
+        //         }
+        //     } catch (error) {
+        //         console.error("Failed to fetch messages:", error);
+        //     }
+        // }
+
+
+
+async function fetchMessages() {
+    try {
+        // Clear the message box first
+        messageBox.innerHTML = '';
+
+        // ✅ Show welcome message AFTER clearing
+        if (!hasShownWelcome) {
+            const botMessage = document.createElement("div");
+            botMessage.classList.add("message", "bot");
+            botMessage.innerHTML = `
+                Hello! I’m Milo from TrainXar, your personal health and wellness coach.  😊
+                <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            `;
+            messageBox.appendChild(botMessage);
+            hasShownWelcome = true;
         }
+        
+
+        const response = await fetch(`${API_BASE_URL}/get-messages?bot_id=${BOT_ID}&user_id=${USER_ID}`);
+        const data = await response.json();
+
+        if (Array.isArray(data.data)) {
+            data.data.forEach((msg) => {
+                if (msg.media_type == 'button') {
+                    sendbutton(false, true);
+                } else if (msg.media_type != '' && msg.media_path != null) {
+                    addMessage(msg.content, msg.role === 'user', true, msg);
+                } else {
+                    addMessage(msg.content, msg.role === 'user', false, msg);
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Failed to fetch messages:", error);
+    }
+}
+
+            if (messageInput) {
+                messageInput.value = "Hi Milo";
+            }
+
 
         async function sendFiles(files) {
             const formData = new FormData();
@@ -576,6 +633,17 @@
         });
 
         fetchMessages(); // Initial fetch
+
+//         const scrollBtn = document.getElementById('scrollToBottom');
+//          scrollBtn.addEventListener('click', () => {
+//                messageBox.scrollTo({
+//                    top: messageBox.scrollHeight,
+//                    behavior: 'smooth'
+//                });
+//        });
+
+
+
     </script>
 
 </body>
