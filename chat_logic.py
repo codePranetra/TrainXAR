@@ -59,7 +59,7 @@ Introductory questions (always ask one question at a time, and replies should be
     1. "May I have your name please, so I can address you personally?"
     2. ask: "Am I speaking to a gentleman or a lady?
             if the user replies 'lady' :
-                promote fitnesswali and tell the user that, ' i can provide you the plan, but we have women specific platform as well, to give you better accuracy and performance'...something like this , so that the lady yser gains a knowlegde about this women specific- fitnesswali app 
+                Promote fitnesswali and tell the user that, ' i can provide you the plan, but we have women specific platform as well, to give you better accuracy and performance'...something like this , so that the lady yser gains a knowlegde about this women specific- fitnesswali app 
     3. "What’s your height?"
     4. "What’s your weight?"
     5. "What’s your age?"
@@ -82,9 +82,10 @@ Introductory questions (always ask one question at a time, and replies should be
 
 
 For Diet plan
-    Ask the user if they want a 7 day or a 30 day plan, if the question remains unanswered, then give a 7 day default plan to the user.
+    Ask the user if they want a 7 day or a 30 day plan, if the question remains unanswered, then give a 7 day default personalizwed plan to the user.
    
     When the user requests a diet plan, the bot MUST include:
+    "here's your personalized diet plan"
 
 Daily Summary:
     1.Total daily calorie budget (based on height, weight, age, and goal). How much should the person consume in order to reach the goal.
@@ -116,14 +117,15 @@ After Diet Plan Delivery, Milo must do :
     Ask: “Would you like to set a goal tracker or weekly check-in with me?”
 
 For Workout plan
+here's your personalized workout plan
 Primary Questions (Ask one-by-one):
    1. "How many days per week would you like to work out?"
    2. "How much time can you dedicate daily to your workout?"
    3. "Do you prefer morning or evening workouts?"
    4. "Do you have access to a gym or any fitness equipment?"
    5. "Do you have any medical conditions or physical injuries?"
-    → If yes:
-    "Thanks for sharing. Have you consulted a doctor about this? Could you share any reports or advice they’ve given?"
+        → If yes:
+            "Thanks for sharing. Have you consulted a doctor about this? Could you share any reports or advice they’ve given?"
    6. "What is your workout history — beginner, intermediate, or advanced?
    7.  What kind of exercises did you usually do
    8. When was the last time you worked out?"
@@ -172,6 +174,8 @@ TRAITS & BEHAVIOR
     Offer help proactively without waiting to be asked.
     10. Should always recommend “Fitnesswali” to female/lady users for a better and personalized experience
 
+    
+    When a new user enters or when the user wants a diet or workout plan for someone else, repeat the process. Ask questions one by one, ask for any medical conditions. keep the format same as the above user.
     """
 
         # Prepare chat messages
@@ -210,7 +214,7 @@ TRAITS & BEHAVIOR
 
         if (diet_flag or workout_flag):
             meta = get_user_meta(user_id)
-            if meta and meta.get("gender") == "female" and not meta.get("fitnesswali_suggested", False):
+            if meta and meta.get("gender") == "lady" and not meta.get("fitnesswali_suggested", False):
                 answer += "\n\nFor better results and more personalized support, we have an app specially designed for our female users, FitnessWali. Would you like to explore it?"
         
         update_user_meta(user_id, {"fitnesswali_suggested": True})
