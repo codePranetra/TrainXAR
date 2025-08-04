@@ -26,58 +26,44 @@ def contains_workout_keywords(text: str) -> bool:
 
 def get_answer(user_query: str, user_id: str) -> str:
     try:
-
-          # 1. Check if user is answering the gender question
-        normalized_input = user_query.strip().lower()
-        if normalized_input in ["gentleman", "lady", "other"]:
-            update_user_meta(user_id, {"gender": normalized_input})
-
         # Retrieve context and chat history
         top_chunks = retrieve_relevant_chunks(user_query, os.getenv("PINECONE_INDEX_NAME"))
         context_text = "\n\n".join(top_chunks)
         db_messages = get_conversation_history(user_id)
+        logging.info(f"[History] Messages for user_id {user_id}: {db_messages}")
 
-        # Flags
-        injury_flag = contains_injury_keywords(user_query)
-        diet_flag = contains_diet_keywords(user_query)
-        workout_flag = contains_workout_keywords(user_query)
-
-        # Modify query if injury is mentioned
-        if injury_flag:
-            user_query += "\n(Note: I’ve mentioned an injury or medical issue above. Please ask if I’ve consulted a doctor and request reports as per system instructions.)"
 
         # Construct system prompt
         # system_prompt = open("system_prompt_milo.txt", "r").read()
         system_prompt = """
-
 Initial introduction
-FIRST MESSAGE (must be said exactly as written – no variation):
- "Hello!. How can I assist you today?"
+FIRST MESSAGE (must be said exactly as written - no variation):
+ Hello! How can I assist you today?
 
 Introductory questions (always ask one question at a time, and replies should be concise)
-    1. "May I have your name please, so I can address you personally?"
-    2. ask: "Am I speaking to a gentleman or a lady?
+    1. May I have your name please, so I can address you personally?
+    2. Ask: "Am I speaking to a gentleman or a lady?
             if the user replies 'lady' :
-                Promote fitnesswali and tell the user that, ' i can provide you the plan, but we have women specific platform as well, to give you better accuracy and performance'...something like this , so that the lady yser gains a knowlegde about this women specific- fitnesswali app 
-    3. "What’s your height?"
-    4. "What’s your weight?"
-    5. "What’s your age?"
-    6. "How many meals do you usually have per day?"
-    7. "What type of diet do you usually follow — veg, non-veg, vegan, keto, or eggetarian?"
+                Promote fitnesswali and tell the user that, ' i can provide you the plan, but we have women specific platform as well, to give you better accuracy and performance'...something like this , so that the lady user gains a knowlegde about this women specific- fitnesswali app 
+    3. What’s your height?
+    4. What’s your weight?
+    5. What’s your age?
+    6. How many meals do you usually have per day?
+    7. What type of diet do you usually follow — veg, non-veg, vegan, keto, or eggetarian?
             Important: If the user says 'vegetarian', do not include eggs in the plan.
-    8. "What does your everyday diet usually look like?"
-    9. "Do you have any food allergies or intolerances — like gluten, dairy, or nuts?"
-    10. "Any medical conditions or dietary restrictions I should know of?"
+    8. What does your everyday diet usually look like?
+    9. Do you have any food allergies or intolerances — like gluten, dairy, or nuts?
+    10. Any medical conditions or dietary restrictions I should know of?
         → If yes:
-            "Thanks for sharing. Have you consulted a doctor for this? "
+            "Thanks for sharing. Have you consulted a doctor for this? 
             After the user replies:
-                "Can you share medical advice or reports if available? It helps me personalize your diet and workouts better."
+                "Can you share medical advice or reports if available? It helps me personalize your diet and workouts better.
         If No :
             consult a doctor
-    11. "What are your specific dietary goals — weight loss, muscle gain, maintenance, or something else?"
-    12. "Let’s get started on creating a short-term and long-term goal to achieve quantifiable results."
-    13. "Would you like me to provide recipes for your meals?"
-    14. "Would you prefer a 7-day or 30-day diet plan?"
+    11. What are your specific dietary goals — weight loss, muscle gain, maintenance, or something else?
+    12. Let’s get started on creating a short-term and long-term goal to achieve quantifiable results.
+    13. Would you like me to provide recipes for your meals?
+    14. Would you prefer a 7-day or 30-day diet plan?
         → If not answered, default to 7-day plan
 
 
@@ -154,17 +140,17 @@ After Diet Plan Delivery, Milo must do :
 For Workout plan
 here's your personalized workout plan
 Primary Questions (Ask one-by-one):
-   1. "How many days per week would you like to work out?"
-   2. "How much time can you dedicate daily to your workout?"
-   3. "Do you prefer morning or evening workouts?"
-   4. "Do you have access to a gym or any fitness equipment?"
-   5. "Do you have any medical conditions or physical injuries?"
+   1. How many days per week would you like to work out?
+   2. How much time can you dedicate daily to your workout?
+   3. Do you prefer morning or evening workouts?
+   4. Do you have access to a gym or any fitness equipment?
+   5. Do you have any medical conditions or physical injuries?
         → If yes:
-            "Thanks for sharing. Have you consulted a doctor about this? Could you share any reports or advice they’ve given?"
-   6. "What is your workout history — beginner, intermediate, or advanced?
-   7.  What kind of exercises did you usually do
-   8. When was the last time you worked out?"
-   9. "What are your short-term and long-term fitness goals?"
+            "Thanks for sharing. Have you consulted a doctor about this? Could you share any reports or advice they’ve given?
+   6. What is your workout history — beginner, intermediate, or advanced?
+   7. What kind of exercises did you usually do
+   8. When was the last time you worked out?
+   9. What are your short-term and long-term fitness goals?
 
 
 Each Workout Day Must Include:
@@ -186,63 +172,27 @@ If user is a “lady”:
 
 Ask: “Would you like a custom diet plan to boost your results?”
 Ask: “Would you like to set a goal tracker or weekly check-in with me?”
-
-
-    """
-
+"""
         # Prepare chat messages
-        messages = [{"role": "system", "content": system_prompt}]
+        messages = [
+            {"role": "system", "content": system_prompt}            
+        ]
 
         if context_text:
-            messages.append({"role": "assistant", "content": f"Here’s some helpful context:\n{context_text}"})
-
-        # Add past conversation
-        for msg in db_messages:
-            messages.append({"role": msg.role, "content": msg.content})
-
-        # Special reminder for injury
-        if injury_flag:
-            messages.append({
-                "role": "assistant",
-                "content": "User mentioned an injury or medical issue. As per instructions, ask whether they have consulted a doctor and request any reports. Prioritize safety."
-            })
-
-        '''
-        # Insert logic if user repeats diet/workout request
-        if diet_flag:
-            for msg in reversed(db_messages):
-                if "diet plan" in msg.content.lower() and msg.role == "assistant":
-                    user_query += "\n(Note: I've already asked for a diet plan. Please continue or complete it without asking again.)"
-                    break
-                
-       
-
-        if workout_flag:
-            for msg in reversed(db_messages):
-                if "workout plan" in msg.content.lower() and msg.role == "assistant":
-                    user_query += "\n(Note: I've already asked for a workout plan. Please continue or complete it without asking again.)"
-                    break
-                    '''
-
-        if (diet_flag or workout_flag):
-            meta = get_user_meta(user_id)
-            if meta and meta.get("gender") == "lady" and not meta.get("fitnesswali_suggested", False):
-                answer += "\n\nFor better results and more personalized support, we have an app specially designed for our female users, FitnessWali. Would you like to explore it?"
-        
-        update_user_meta(user_id, {"fitnesswali_suggested": True})
-
+            messages.append({"role": "system", "content": f"Here’s some helpful context:\n{context_text}"})
         # Append user query
+        messages.extend(db_messages)
         messages.append({"role": "user", "content": user_query})
-
+        
         # OpenAI response
         response = openai.ChatCompletion.create(
-            model='gpt-4.1-nano',
+            model='gpt-4o-mini',
             messages=messages,
             temperature=0.3,
             max_tokens=2000,
         )
 
-        answer = response["choices"][0]["message"]["content"]
+        answer = response["choices"][0]["message"]["content"]   
         return answer
 
     except Exception as e:
