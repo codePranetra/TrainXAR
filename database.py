@@ -121,16 +121,11 @@ def get_conversation_history(user_id: str, limit: int = None):
 
         results = query.all()[::-1]  # Reverse to oldest first
 
-        logging.info(f"📜 Retrieved messages from DB for {user_id}: {results}")
 
         # Return as list of dicts: {'role': ..., 'content': ...}
         return [{'role': role, 'content': content} for role, content in results]
     finally:
         session.close()
-
-
-
-
 
 
 def get_media_path(user_id: str, bot_id: str = None, limit: int = None):
