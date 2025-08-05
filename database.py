@@ -106,17 +106,24 @@ def get_user_message(user_id):
         session.close()
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 def get_conversation_history(user_id: str, limit: int = None):
     session = get_db_session()
     try:
-        query = session.query(Message).filter(
+        query = session.query(Message.role, Message.content).filter(
             Message.user_id == user_id
         ).order_by(Message.created_at.desc())
 
         if limit:
             query = query.limit(limit)
 
-        return query.all()[::-1]  # Reverse to oldest first
+        results = query.all()[::-1]  # Reverse to oldest first
+
+
+        # Return as list of dicts: {'role': ..., 'content': ...}
+        return [{'role': role, 'content': content} for role, content in results]
     finally:
         session.close()
 
