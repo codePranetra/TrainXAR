@@ -8,7 +8,8 @@ load_dotenv()  # Load variables from .env
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")  
-PINECONE_ENV = os.getenv("PINECONE_ENV")  
+PINECONE_ENV = os.getenv("PINECONE_ENV")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")  
 
 # Chatbot Config
 EMBED_MODEL = "text-embedding-ada-002"
@@ -187,6 +188,9 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 DB_PORT = os.getenv("DB_PORT")
+
+# Base URL
+BASE_URL = os.getenv("base_url")
 
 
 # Email configuration
