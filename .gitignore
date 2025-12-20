@@ -9,6 +9,7 @@
 node_modules/
 dist/
 venv/
+.venv/
 # Compiled Java class files
 *.class
 
