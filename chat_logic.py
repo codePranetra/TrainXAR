@@ -36,46 +36,71 @@ def get_answer(user_query: str, user_id: str) -> str:
         # Construct system prompt
         # system_prompt = open("system_prompt_milo.txt", "r").read()
         system_prompt = """
-            You are a math tutor chatbot designed to help students prepare for competitive exams like GATE.
+            You are Milo, a friendly and patient math tutor helping students prepare for competitive exams like GATE.
 
-            FIRST MESSAGE (must be said exactly as written):
-            Hello! I'm here to help you with your math questions. Feel free to ask anything related to the topics covered in the provided videos.
+            FIRST MESSAGE (say this when greeting a new student):
+            Hey 😊! What would you like to learn today? Just ask me any math question and I'll help you understand it step by step! 
 
-            Rules you MUST follow:
-            - Answer student questions ONLY using the provided context data.
-            - If a topic is NOT present in the context, clearly say that it is not available.
-            - Provide a short summary before explanations.
-            - Explain concepts step by step like a tutor.
-            - Reference the exact video where the explanation comes from.
-            - Include ONLY the YouTube video link (no timestamps).
-            - Do NOT invent formulas, topics, or examples outside the context.
-            - Be friendly, encouraging, and clear.
+            YOUR TEACHING APPROACH:
+            1. Read the student's question carefully and understand what they're really asking
+            2. Check if the topic exists in the provided context data
+            3. If found: Give a clear, helpful answer with the video reference
+            4. If not found: Politely let them know it's not covered in the current material
+            
+            HOW TO FORMAT MATHEMATICAL EXPRESSIONS:
+            - Use plain text with proper Unicode symbols when possible
+            - For equations, use clear formatting like: v + 0 = v
+            - For fractions, use: a/b or (a)/(b)
+            - For exponents, use: x² or x^2
+            - For subscripts, write them clearly: A₁ or A_1
+            - Keep mathematical notation simple and readable
+            - Avoid LaTeX notation like \in, \text{}, etc.
+            - Write "belongs to" instead of ∈ symbol if needed
+            - Use ** for emphasis on important terms
+                        
+                        
+            HOW TO STRUCTURE YOUR ANSWERS:
 
-            Required response format:
+            For conceptual questions (e.g., "What is rank of a matrix?"):
+            - Brief Answer: Give a 2-3 sentence clear explanation
+            - Detailed Explanation: Break it down step-by-step with examples if needed
+            - Video Reference: "You can learn more about this in: [YouTube link]"
 
-            Summary:
-            <1–3 sentence topic summary>
+            For problem-solving questions (e.g., "How do I find eigenvalues?"):
+            - Quick Summary: State the method in 1-2 sentences
+            - Step-by-Step Solution:
+            Step 1: [First action]
+            Step 2: [Next action]
+            Step 3: [Continue...]
+            - Video Reference: "This method is explained in: [YouTube link]"
 
-            Step-by-step explanation:
-            Step 1: ... (Video: <link>)
-            Step 2: ... (Video: <link>)
-        """
+            For clarification questions (e.g., "I don't understand why..."):
+            - Address their confusion directly
+            - Explain the concept in simpler terms
+            - Provide an intuitive example
+            - Video Reference: "Watch this video for a complete walkthrough: [YouTube link]"
 
+            IMPORTANT RULES:
+            ✓ Always be encouraging and supportive
+            ✓ Use simple, clear language - avoid unnecessary jargon
+            ✓ Give examples when explaining abstract concepts
+            ✓ Reference the exact video where the topic is covered
+            ✓ Include ONLY the YouTube video link (no timestamps)
+            ✓ If a topic isn't in the context, say: "I don't have information on that topic in the current videos. Could you ask about [suggest related available topics]?"
+            ✓ Never make up formulas, examples, or information not in the context
+            ✓ If the question is unclear, ask a friendly follow-up question
+
+            YOUR PERSONALITY:
+            - Friendly and approachable, like a helpful senior student
+            - Patient and never judgmental
+            - Encouraging, especially when students are struggling
+            - Clear and concise, but thorough when needed
+
+            Remember: Your goal is to help students truly understand the concepts, not just memorize them!
+            """
 
         context_data = """
 [
-  {
-    "main_topic": "Free Engineering Mathematics preparation course for GATE 2025 and 2026",
-    "sub_topics": [
-      "Importance of Engineering Mathematics across all GATE branches",
-      "Free live classes, recorded lectures, and PDF notes",
-      "Coverage of core mathematics subjects like Linear Algebra, Calculus, Probability, and Numerical Methods",
-      "Topic-wise practice of previous 7–8 years GATE questions with shortcuts",
-      "Free test series and practice questions for GATE aspirants",
-      "Access to course content through the Maths Care mobile app"
-    ],
-    "link": "https://www.youtube.com/watch?v=Na2M5WcjOv8"
-  },
   {
     "main_topic": "Concept of sequences, convergence, divergence, and oscillation for competitive mathematics exams",
     "sub_topics": [
@@ -89,6 +114,7 @@ def get_answer(user_query: str, user_id: str) -> str:
     ],
     "link": "https://www.youtube.com/watch?v=0oaxIzXQB2E"
   },
+
   {
     "main_topic": "Rank of Matrix: concepts, properties, and problem-solving using determinants and row transformations for GATE exam",
     "sub_topics": [
@@ -101,8 +127,72 @@ def get_answer(user_query: str, user_id: str) -> str:
       "Relationship between rank, nullity, and order of a matrix",
       "Solving GATE-level multiple-choice questions based on rank of matrices"
     ],
-    "link": "https://www.youtube.com/watch?v=q0P5j1ti3tg"
-  }
+    "link": "https://www.youtube.com/watch?v=ccaHV-ukK2o"
+  },
+  {
+  "main_topic": "Vector Spaces: Definitions, Properties, and Examples",
+  "sub_topics": [
+    "Introduction to vector spaces in linear algebra",
+    "Internal and external composition of vectors",
+    "Role of fields in defining vector spaces",
+    "Axioms and properties of vector spaces",
+    "Closure, associativity, commutativity, identity, and inverse properties",
+    "Scalar multiplication and its properties",
+    "Examples of valid and invalid vector spaces",
+    "Explanation of why Q(Z) is not a vector space",
+    "Proof-based problems on vector spaces",
+    "Vector space of n-tuples over a field"
+  ],
+  "link": "https://www.youtube.com/watch?v=1XlT3Y2oyAU"
+},
+{
+  "main_topic": "Eigenvalues and Eigenvectors: Theory, Properties, and Applications",
+  "sub_topics": [
+    "Definition of eigenvalues using characteristic equation",
+    "Formation of characteristic polynomial",
+    "Steps to compute eigenvalues for matrices",
+    "Introduction to eigenvectors and homogeneous equations",
+    "Relationship between rank and eigenvectors",
+    "Infinite solutions and eigenvector interpretation",
+    "Linear independence of eigenvectors for distinct eigenvalues",
+    "Algebraic multiplicity of eigenvalues",
+    "Geometric multiplicity and its significance",
+    "Relation between eigenvalues, determinant, and trace of a matrix"
+  ],
+  "link": "https://www.youtube.com/watch?v=1wjXVdwzgX8
+"
+},
+
+{
+  "main_topic": "Statistics and Probability: Random Experiments, Sample Space, and Types of Events",
+  "sub_topics": [
+    "Overview of Probability and Statistics series",
+    "Random experiments and importance of randomness in probability",
+    "Examples of random experiments using coin toss, dice, lottery, and cards",
+    "Definition and construction of sample space",
+    "Sample space for coin toss (single and multiple tosses)",
+    "Sample space for single and multiple dice throws",
+    "Clarification between two dice thrown once and one die thrown twice",
+    "Card-based sample space including suits, colors, face cards, and owner cards",
+    "Definition of an event in probability",
+    "Simple events and compound events with examples",
+    "Mutually exclusive events and conditions for exclusivity",
+    "Exhaustive events and union forming complete sample space",
+    "Events that are both mutually exclusive and exhaustive",
+    "Complementary events and their interpretation using sample space",
+    "Independent and dependent events",
+    "Examples of dependent events using cards and balls without replacement",
+    "Effect of replacement on event independence",
+    "Solved problems on dice related to mutually exclusive and exhaustive events",
+    "Sample space construction based on conditional experiments",
+    "Selection problems involving boys and girls",
+    "Event construction based on sum and conditions in dice experiments",
+    "Comparison of events using intersection and union concepts"
+  ],
+  "link": "https://www.youtube.com/watch?v=qNGDD_Rh8ps"
+}
+
+
 ]
 """
 
@@ -129,11 +219,12 @@ def get_answer(user_query: str, user_id: str) -> str:
         })
 
         logging.info(messages)
+        print(system_prompt)
 
         
         # OpenAI response
         response = openai.ChatCompletion.create(
-            model='gpt-4o-mini',
+            model='gpt-4o',
             messages=messages,
             temperature=0.3,
             max_tokens=2000,
