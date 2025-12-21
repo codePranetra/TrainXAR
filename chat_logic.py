@@ -30,8 +30,6 @@ def get_answer(user_query: str, user_id: str) -> str:
         # top_chunks = retrieve_relevant_chunks(user_query, os.getenv("PINECONE_INDEX_NAME"))
         # context_text = "\n\n".join(top_chunks)
         db_messages = get_conversation_history(user_id)
-        logging.info(f"[History] Messages for user_id {user_id}: {db_messages}")
-
 
         # Construct system prompt
         # system_prompt = open("system_prompt_milo.txt", "r").read()
@@ -72,7 +70,8 @@ def get_answer(user_query: str, user_id: str) -> str:
             Step 1: [First action]
             Step 2: [Next action]
             Step 3: [Continue...]
-            - Video Reference: "This method is explained in: [YouTube link]"
+            - Video Reference: provide video in iframe with 200px height, 200px width "Watch the full explanation here: [YouTube link]"
+
 
             For clarification questions (e.g., "I don't understand why..."):
             - Address their confusion directly
@@ -218,9 +217,6 @@ def get_answer(user_query: str, user_id: str) -> str:
             "content": user_query
         })
 
-        logging.info(messages)
-        print(system_prompt)
-
         
         # OpenAI response
         response = openai.ChatCompletion.create(
@@ -236,5 +232,3 @@ def get_answer(user_query: str, user_id: str) -> str:
     except Exception as e:
         logging.error(f"Error generating response from OpenAI: {e}")
         return "Sorry, I encountered an issue. Please try again later."
-
-

@@ -3,32 +3,34 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Chat with TrainXar</title>
+    <title>Math Tutor - TrainXar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Same styling as before */
+        /* Math Tutor Styling */
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
-            background: #f0f2f5;
-            justify-content: center;
-            align-items: center;
+            background: #f5f7fa;
+            position: relative;
+            overflow: hidden;
         }
 
         .main-container {
-            width: 96%;
-            max-width: 1500px;
-            height: 90vh;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(30,77,183,0.1);
+            width: 100%;
+            height: 100vh;
+            background: #ffffff;
             overflow: hidden;
-            margin: 20px auto;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .chat-container {
@@ -44,74 +46,163 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1E4DB7;
-            padding: 5px 20px;
+            background: #48629a;
+            padding: 18px 24px;
             color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(30,77,183,0.08);
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
         }
-        .profile-pic img{
-            width: 50px;
-            height: 50px;
+
+        .header::after {
+            content: '∞';
+            position: absolute;
+            right: 24px;
+            font-size: 28px;
+            opacity: 0.2;
+            font-weight: 300;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-pic {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-pic img {
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             object-fit: cover;
             vertical-align: middle;
             background: #fff;
-            border: 2px solid #5ac8fa;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .profile-pic .name {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .message-box {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e8f4fd' fill-opacity='0.3'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: repeat;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .message-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .message-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .message-box::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .message-box::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .message {
-            padding: 14px 20px;
-            margin: 8px 0;
-            max-width: 70%;
-            border-radius: 18px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            max-width: 75%;
+            border-radius: 20px;
             word-wrap: break-word;
-            font-size: 16px;
-            box-shadow: 0 2px 8px rgba(30,77,183,0.06);
-            transition: background 0.2s;
-            border: 1.5px solid #e0eaff;
+            font-size: 15px;
+            line-height: 1.5;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+            position: relative;
         }
 
+
         .message.user {
-            background: #eaf6fb;
-            color: #1E4DB7;
+            background: #436dc6;
+            color: #ffffff;
             align-self: flex-end;
-            border-bottom-right-radius: 8px;
-            border-top-right-radius: 18px;
-            border-top-left-radius: 18px;
-            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 6px;
+            border-top-right-radius: 20px;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
             margin-left: 20%;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
+            box-shadow: 0 2px 4px rgba(37,99,235,0.2);
         }
 
         .message.bot {
-            background: #eaf6fb;
-            color: #1E4DB7;
+            background: #f8fafc;
+            color: #1e293b;
             align-self: flex-start;
-            border-bottom-left-radius: 8px;
-            border-top-right-radius: 18px;
-            border-top-left-radius: 18px;
-            border-bottom-right-radius: 18px;
+            border-bottom-left-radius: 6px;
+            border-top-right-radius: 20px;
+            border-top-left-radius: 20px;
+            border-bottom-right-radius: 20px;
             margin-right: 20%;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .message.bot {
+            position: relative;
+        }
+
+        .message.bot code,
+        .message.bot pre {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .message.bot pre {
+            padding: 12px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .message.bot strong {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .message.bot h1, .message.bot h2, .message.bot h3 {
+            color: #2563eb;
+            margin-top: 16px;
+            margin-bottom: 8px;
         }
 
         .message-time {
-            font-size: 12px;
-            color: #888;
-            margin-top: 6px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 4px;
             text-align: right;
+            font-weight: 400;
+        }
+
+        .message.bot .message-time {
+            color: #64748b;
         }
 
         .date-separator {
@@ -135,34 +226,33 @@
 
         .input-container {
             display: flex;
-            padding: 15px 20px;
-            border-top: 1px solid #e0eaff;
-            gap: 10px;
-            background: #fff;
-            box-shadow: 0 -2px 10px rgba(30,77,183,0.08);
-            backdrop-filter: blur(10px);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            padding: 18px 24px;
+            border-top: 1px solid #e5e7eb;
+            gap: 12px;
+            background: #ffffff;
         }
 
         .input-container input[type="text"] {
             flex: 1;
-            padding: 12px 18px;
-            border: 2px solid #e0eaff;
+            padding: 14px 20px;
+            border: 1px solid #d1d5db;
             border-radius: 24px;
             margin-right: 10px;
-            font-size: 16px;
-            background: #fff;
+            font-size: 15px;
+            background: #ffffff;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(30,77,183,0.06);
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            color: #1f2937;
         }
 
         .input-container input[type="text"]:focus {
-            border-color: #5ac8fa;
-            box-shadow: 0 2px 12px rgba(90,200,250,0.15);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .input-container input[type="text"]::placeholder {
+            color: #a0aec0;
         }
 
         .input-container input[type="file"] {
@@ -170,25 +260,29 @@
         }
 
         .input-container label, .input-container button {
-            padding: 10px 15px;
-            background: #1E4DB7;
+            padding: 14px 20px;
+            background: #2563eb;
             color: #fff;
             border: none;
             border-radius: 24px;
             cursor: pointer;
             font-size: 16px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(30,77,183,0.15);
-            min-width: 50px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            min-width: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 500;
         }
 
         .input-container label:hover, .input-container button:hover {
-            background: #3a6edc;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(30,77,183,0.2);
+            background: #1d4ed8;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .input-container label:active, .input-container button:active {
+            transform: translateY(0);
         }
 
         .file-link {
@@ -197,8 +291,17 @@
         }
 
         .typing-loader {
-            color: #555;
+            color: #2563eb;
             margin: 5px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .typing-loader::before {
+            content: '⏳';
+            font-size: 18px;
         }
         .button-group {
             margin-top: 10px;
@@ -207,21 +310,22 @@
         }
 
         .bot-button {
-            padding: 10px 15px;
-            background: #1E4DB7;
+            padding: 12px 20px;
+            background: #2563eb;
             color: #fff;
-            border: 2px solid #1E4DB7;
+            border: none;
             border-radius: 24px;
             cursor: pointer;
             width: 50%;
-            font-size: 16px;
-            transition: background 0.2s;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .bot-button:hover {
-            background-color: #3a6edc;
-            color: #fff;
-            border: 2px solid #3a6edc;
+            background: #1d4ed8;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .bot-button.disabled-button {
             background-color: #e0eaff !important; /* Light blue gray out */
@@ -248,6 +352,27 @@
         .file-icon-download{
             height: 20px;
         }
+        
+        .youtube-iframe {
+            width: 100%;
+            max-width: 560px;
+            height: 315px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        
+        .youtube-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .bot p{
+            margin: 4px;
+        } 
        
         
 
@@ -261,8 +386,8 @@
             <div class="header">
                 <div class="profile-info">
                     <div class="profile-pic">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Bot Avatar">
-                        <span class="name">TrainXar Bot</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="Math Tutor Avatar">
+                        <span class="name">Milo - Math Tutor</span>
                     </div>
                 </div>
                 <!-- <div>John Doe</div>
@@ -274,7 +399,7 @@
             </div>
 
             <div class="input-container">
-                <input type="text" id="message-input" placeholder="Type a message..." />
+                <input type="text" id="message-input" placeholder="Ask me any math question..." />
                 <label for="file-upload" style="display: none;"><i class="fas fa-paperclip"></i></label>
                 <input type="file" id="file-upload" multiple />
                 <button id="send-button"><i class="fas fa-paper-plane"></i></button>
@@ -302,11 +427,40 @@
             return userId;
         }
 
-    const USER_ID = getUserId();
+        const USER_ID = getUserId();
     let greetingAdded = false;
     let hasShownWelcome = false;
 
+        // Function to extract YouTube video ID from various URL formats
+        function extractYouTubeId(url) {
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
 
+        // Function to convert YouTube links to iframes
+        function convertYouTubeLinks(html) {
+            // Replace YouTube links in anchor tags (markdown converts URLs to <a> tags)
+            const linkRegex = /<a[^>]*href=["']([^"']*youtube\.com\/watch\?v=[^"']*|[^"']*youtu\.be\/[^"']*)["'][^>]*>([^<]*)<\/a>/gi;
+            
+            return html.replace(linkRegex, (match, href, linkText) => {
+                const videoId = extractYouTubeId(href);
+                if (videoId) {
+                    // Return iframe HTML string
+                    return `<div class="youtube-container"><iframe class="youtube-iframe" src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0"></iframe></div>`;
+                }
+                return match; // Return original if not a valid YouTube link
+            });
+        }
 
         function addMessage(content, isUser, isFile = false, message = null, local = false) {
             const msg = document.createElement('div');
@@ -341,9 +495,14 @@
                 messageBox.appendChild(msg);
             }
             else if (!isUser) {
-                // Bot message: render markdown and sanitize
+                // Bot message: render markdown, convert YouTube links to iframes, then sanitize
                 const html = marked.parse(content);
-                const cleanHtml = DOMPurify.sanitize(html);
+                const htmlWithIframes = convertYouTubeLinks(html);
+                // Allow iframes in DOMPurify config for YouTube videos
+                const cleanHtml = DOMPurify.sanitize(htmlWithIframes, {
+                    ADD_TAGS: ['iframe'],
+                    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder']
+                });
                 msg.innerHTML = cleanHtml;
                 messageBox.appendChild(msg);
             }
@@ -456,7 +615,11 @@ async function fetchMessages() {
             const botMessage = document.createElement("div");
             botMessage.classList.add("message", "bot");
             botMessage.innerHTML = `
-                Hey there! 👋 I'm your Math Buddy. I'm here to help you ace your math preparation! 🎯 Feel free to ask me anything. Let's get started! 💪
+                <div style="line-height: 1.8;">
+                    <strong>Hello! 👋 I'm Milo, your friendly math tutor!</strong><br><br>
+                    I'm here to help you understand math concepts, solve problems, and prepare for competitive exams like GATE. Whether you need help with linear algebra, calculus, or any other math topic, I'm ready to guide you step by step! 📚✨<br><br>
+                    <em>What would you like to learn today?</em>
+                </div>
                 <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             `;
             messageBox.appendChild(botMessage);
@@ -483,9 +646,9 @@ async function fetchMessages() {
     }
 }
 
-            if (messageInput) {
-                messageInput.value = "Hi";
-            }
+            //if (messageInput) {
+              //  messageInput.value = "Hi";
+            //}
 
 
         async function sendFiles(files) {
@@ -518,7 +681,10 @@ async function fetchMessages() {
                 const data = await response.json();
                 loader.remove();
 
-                fetchMessages();
+                // Append bot reply instead of refreshing whole chat
+                if (data.reply) {
+                    addMessage(data.reply, false, false, { created_at: new Date().toISOString() });
+                }
             } catch (error) {
                 loader.remove();
                 console.error("File upload failed:", error);
@@ -551,7 +717,10 @@ async function fetchMessages() {
                 const data = await response.json();
                 loader.remove();
 
-                fetchMessages();
+                // Append bot reply instead of refreshing whole chat
+                if (data.reply) {
+                    addMessage(data.reply, false, false, { created_at: new Date().toISOString() });
+                }
             } catch (error) {
                 loader.remove();
                 console.error("Failed to send message:", error);
@@ -594,7 +763,10 @@ async function fetchMessages() {
                 const data = await response.json();
                 loader.remove();
 
-                fetchMessages();
+                // Append bot reply instead of refreshing whole chat
+                if (data.reply) {
+                    addMessage(data.reply, false, false, { created_at: new Date().toISOString() });
+                }
             } catch (error) {
                 loader.remove();
                 if (error.name === "AbortError") {
